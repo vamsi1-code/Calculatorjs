@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator UI with Smoke Effect</title>
+    <style>
+        #Wbody {
+            height: 38vw;
+            width: 20vw;
+            border: 2px solid gray;
+            border-radius: 10px;
+            box-shadow: 2px 2px 2px 2px rgb(188, 182, 182);
+            background-color: black;
+        }
+        #screen {
+            height: 7vw;
+            width: 20vw;
+            border: 1.5px solid gray;
+            border-radius: 7px 10px 0px 0px;
+            margin-bottom: 10px;
+            background-color: aliceblue;
+            position: relative;
+            overflow: hidden;
+        }
+        button {
+            margin-bottom: 10px;
+            margin-left: 12px;
+            height: 5vw;
+            width: 3.5vw;
+            background-color: transparent;
+            border-radius: 10px;
+            box-shadow: 2px 2px 2px 2px;
+            color: white;
+        }
+        button:hover {
+            background-color: crimson;
+            animation-name: animi1;
+            animation-duration: 3s;
+        }
+        @keyframes animi1 {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.2);
+            }
+        }
+        #ac, #val {
+            height: 5vw;
+            width: 8vw;
+        }
+        #val {
+            background-color: crimson;
+        }
+        #val:hover {
+            background-color: white;
+            color: crimson;
+        }
+        body {
+           background: linear-gradient(black, rgb(200, 199, 199));
+        }
+
+    
+        .smoke {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 90%;
+            animation: riseAndFade 5s ease-out forwards;
+            opacity: 0;
+        }
+        #screen{
+            background-color: rgb(71, 69, 70);
+        }
+        #screen1{
+            color: white;
+        }
+
+        @keyframes riseAndFade {
+            0% {
+                transform: translateX(0) translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateX(-20px) translateY(-50px) scale(1.5);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateX(30px) translateY(-100px) scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        
+        .smoke:nth-child(2) {
+            animation-delay: 0.5s;
+            transform: translateX(-10px);
+        }
+
+        .smoke:nth-child(3) {
+            animation-delay: 1s;
+            transform: translateX(10px);
+        }
+
+        @media screen and (min-width: 300px) and (max-width: 900px) {
+            #Wbody {
+                height: 470px;
+                width: 280px;
+            }
+            #screen {
+                height: 100px;
+                width: 280px;
+            }
+            button {
+                margin-left: 10px;
+                height: 60px;
+                width: 50px;
+            }
+            #ac, #val {
+                height: 60px;
+                width: 113px;
+            }
+            #del {
+                margin-left: -7px;
+            }
+            #del1 {
+                margin-left: -15px;
+            }
+            #row {
+                display: grid;
+                grid-template-columns: auto auto auto;
+                gap: 0px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="Wbody">
+        <div id="screen"><h2 id="screen1"></h2></div>
+        <section id="row">
+            <button id="ac"><h1>AC</h1></button>
+            <button id="del"><h1><b>←</b></h1></button>
+            <button id="del1" onclick="addvalue('/')"><h1>÷</h1></button>
+        </section>
+        <button onclick="addvalue('9')"><h1>9</h1></button>
+        <button onclick="addvalue('8')"><h1>8</h1></button>
+        <button onclick="addvalue('7')"><h1>7</h1></button>
+        <button onclick="addvalue('*')"><h1>x</h1></button>
+        <button onclick="addvalue('6')"><h1>6</h1></button>
+        <button onclick="addvalue('5')"><h1>5</h1></button>
+        <button onclick="addvalue('4')"><h1>4</h1></button>
+        <button onclick="addvalue('-')"><h1>-</h1></button>
+        <button onclick="addvalue('3')"><h1>3</h1></button>
+        <button onclick="addvalue('2')"><h1>2</h1></button>
+        <button onclick="addvalue('1')"><h1>1</h1></button>
+        <button onclick="addvalue('+')"><h1>+</h1></button>
+        <button onclick="addvalue('.')"><h1>.</h1></button>
+        <button onclick="addvalue('0')"><h1>0</h1></button>
+        <button id="val"><h1>=</h1></button>
+    </div>
+
+    <audio id="equalSound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+
+    <script>
+        let evaluated = false;
+        const equalSound = document.getElementById('equalSound');
+        const screen1 = document.getElementById('screen1');
+        const screen = document.getElementById('screen');
+
+        function addvalue(x) {
+          
+            equalSound.pause(); 
+            equalSound.currentTime = 0; 
+
+            if (evaluated && !isOperator(x)) {
+                screen1.innerHTML = ""; 
+                evaluated = false;
+            }
+
+            screen1.innerHTML += x;
+        }
+
+        document.getElementById('val').addEventListener("click", (e) => {
+            try {
+                let result = eval(screen1.innerHTML); 
+                screen1.innerHTML = result;
+                evaluated = true; 
+                equalSound.play();
+
+               
+                addSmoke();
+
+            } catch (error) {
+                screen1.innerHTML = "Calculation Error!";
+                evaluated = true;
+            }
+        });
+
+        function addSmoke() {
+            for (let i = 0; i < 3; i++) {
+                const smoke = document.createElement('div');
+                smoke.classList.add('smoke');
+                screen.appendChild(smoke);
+
+               
+                setTimeout(() => {
+                    screen.removeChild(smoke);
+                }, 5000); 
+            }
+        }
+
+        document.getElementById('ac').addEventListener("click", (e) => {
+            screen1.innerHTML = ""; 
+            evaluated = false; 
+            equalSound.pause(); 
+            equalSound.currentTime = 0; 
+        });
+
+        document.getElementById('del').addEventListener("click", (e) => {
+            screen1.innerHTML = screen1.innerHTML.slice(0, -1); 
+            equalSound.pause(); 
+            equalSound.currentTime = 0; 
+        });
+
+        function isOperator(value) {
+            return ['+', '-', '*', '/'].includes(value);
+        }
+    </script>
+</body>
+</html>
+

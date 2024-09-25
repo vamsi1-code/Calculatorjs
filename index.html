@@ -1,18 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator UI with Smoke Effect</title>
+    <title>Calculator UI-vamsi</title>
     <style>
         #Wbody {
             height: 38vw;
             width: 20vw;
             border: 2px solid gray;
             border-radius: 10px;
-            box-shadow: 2px 2px 2px 2px rgb(188, 182, 182);
+            box-shadow: 1px 4px 10px 1px rgb(188, 182, 182);
             background-color: black;
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
         }
         #screen {
             height: 7vw;
@@ -20,9 +22,11 @@
             border: 1.5px solid gray;
             border-radius: 7px 10px 0px 0px;
             margin-bottom: 10px;
-            background-color: aliceblue;
+            background-color: rgb(62, 63, 63);
+            color: white;
             position: relative;
             overflow: hidden;
+            text-align: right;
         }
         button {
             margin-bottom: 10px;
@@ -59,39 +63,34 @@
             color: crimson;
         }
         body {
-           background: linear-gradient(black, rgb(200, 199, 199));
+           background: linear-gradient(black, rgb(43, 42, 42));
+           
         }
 
-    
+        /* Realistic smoke effect */
         .smoke {
             position: absolute;
             bottom: 0;
-            left: 50%;
-            width: 90px;
-            height: 90px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 90%;
-            animation: riseAndFade 5s ease-out forwards;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: riseAndFade 4s ease-out forwards;
             opacity: 0;
         }
-        #screen{
-            background-color: rgb(71, 69, 70);
-        }
-        #screen1{
-            color: white;
-        }
 
+        
         @keyframes riseAndFade {
             0% {
                 transform: translateX(0) translateY(0) scale(1);
-                opacity: 0.7;
+                opacity: 0.6;
             }
             50% {
                 transform: translateX(-20px) translateY(-50px) scale(1.5);
                 opacity: 0.4;
             }
             100% {
-                transform: translateX(30px) translateY(-100px) scale(2.5);
+                transform: translateX(40px) translateY(-150px) scale(2.5);
                 opacity: 0;
             }
         }
@@ -99,12 +98,15 @@
         
         .smoke:nth-child(2) {
             animation-delay: 0.5s;
-            transform: translateX(-10px);
+            background: rgba(255, 255, 255, 0.2);
         }
-
         .smoke:nth-child(3) {
             animation-delay: 1s;
-            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .smoke:nth-child(4) {
+            animation-delay: 1.5s;
+            background: rgba(255, 255, 255, 0.4);
         }
 
         @media screen and (min-width: 300px) and (max-width: 900px) {
@@ -172,65 +174,91 @@
         const screen1 = document.getElementById('screen1');
         const screen = document.getElementById('screen');
 
-        function addvalue(x) {
-          
-            equalSound.pause(); 
+        
+        function stopMusic() {
+            equalSound.pause();
             equalSound.currentTime = 0; 
+        }
 
+        const allButtons = document.querySelectorAll('button');
+        allButtons.forEach(button => {
+            button.addEventListener('click', stopMusic);
+        });
+
+       
+        function addvalue(x) {
             if (evaluated && !isOperator(x)) {
                 screen1.innerHTML = ""; 
                 evaluated = false;
             }
-
             screen1.innerHTML += x;
         }
 
-        document.getElementById('val').addEventListener("click", (e) => {
+       
+        document.getElementById('val').addEventListener("click", () => {
             try {
-                let result = eval(screen1.innerHTML); 
+                let result = eval(screen1.innerHTML);
                 screen1.innerHTML = result;
                 evaluated = true; 
-                equalSound.play();
+                equalSound.play(); 
 
-               
-                addSmoke();
-
+                addRealisticSmoke(); 
             } catch (error) {
-                screen1.innerHTML = " Values iyina sarigga Ivvara";
+                screen1.innerHTML = "Error!";
                 evaluated = true;
             }
         });
 
-        function addSmoke() {
-            for (let i = 0; i < 3; i++) {
+        
+        function addRealisticSmoke() {
+            for (let i = 0; i < 5; i++) {
                 const smoke = document.createElement('div');
                 smoke.classList.add('smoke');
+                smoke.style.left = Math.random() * screen.offsetWidth + 'px'; 
                 screen.appendChild(smoke);
 
-               
                 setTimeout(() => {
                     screen.removeChild(smoke);
-                }, 5000); 
+                }, 5000);
             }
         }
 
-        document.getElementById('ac').addEventListener("click", (e) => {
+        document.getElementById('ac').addEventListener("click", () => {
             screen1.innerHTML = ""; 
             evaluated = false; 
-            equalSound.pause(); 
-            equalSound.currentTime = 0; 
+            stopMusic(); 
         });
 
-        document.getElementById('del').addEventListener("click", (e) => {
+       
+        document.getElementById('del').addEventListener("click", () => {
             screen1.innerHTML = screen1.innerHTML.slice(0, -1); 
-            equalSound.pause(); 
-            equalSound.currentTime = 0; 
         });
 
+        
         function isOperator(value) {
             return ['+', '-', '*', '/'].includes(value);
+        }
+
+        
+        function addvalue(x) {
+            let screenText = screen1.innerHTML;
+            if (x === '.') {
+                let lastOperatorIndex = Math.max(screenText.lastIndexOf('+'), screenText.lastIndexOf('-'), screenText.lastIndexOf('*'), screenText.lastIndexOf('/'));
+                let currentNumber = lastOperatorIndex === -1 ? screenText : screenText.slice(lastOperatorIndex + 1);
+                if (currentNumber.includes('.')) {
+                    return;
+                }
+            }
+            if (evaluated && !isOperator(x)) {
+                screen1.innerHTML = x;
+                evaluated = false;
+            } else if (evaluated && isOperator(x)) {
+                evaluated = false;
+                screen1.innerHTML += x;
+            } else {
+                screen1.innerHTML += x;
+            }
         }
     </script>
 </body>
 </html>
-
